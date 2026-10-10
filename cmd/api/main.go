@@ -1,27 +1,30 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
+	// create a new servemux
+	mux := http.NewServeMux()
+
 	// Root API endpoint
-	http.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"message": "Welcome to OLX clone API"}`))
+		w.WriteHeader(http.StatusOK)
+
+		w.Write([]byte(`{"version": "1.0.0", "status": "ok", "message": "Welcome to OLX clone API"}`))
 	})
 
 	// Health check endpoint
-	http.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{
-			"status":  "ok",
-			"message": "Server is up and running.",
-		})
+
+		w.Write([]byte(`{"status": "ok", "message": "Server is up and running."}`))
 	})
 
 	// Get port from environment variable or default to 8090
@@ -29,13 +32,21 @@ func main() {
 	if PORT == "" {
 		PORT = "8090"
 	}
-
+	
+	// create HTTP server with timeout
+	srv := http.Server {
+		Addr: ":" + PORT,
+		Handler: mux,
+		ReadTimeout:  time.Second * 10,
+		WriteTimeout:  time.Second * 30,
+		IdleTimeout:  time.Second * 60,
+	}
+	
 	// Log before blocking call
 	log.Printf("Server is running on port %v", PORT)
 
 	// Listen on a specific port (blocks until error)
-	err := http.ListenAndServe(":"+PORT, nil)
-	if err != nil {
+	if err := srv.ListenAndServe(); err != nil {
 		log.Fatalf("Server can't start: %v", err)
 	}
 }
