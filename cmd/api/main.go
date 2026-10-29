@@ -31,6 +31,14 @@ func main() {
 		w.Write([]byte(`{"status": "ok", "message": "Server is up and running."}`))
 	})
 
+	// Users endpoint
+	mux.HandleFunc("GET /users", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		w.Write([]byte(`{"status": "ok", "message": "Users endpoint."}`))
+	})
+
 	// create HTTP server with timeout
 	srv := http.Server {
 		Addr: ":" + cfg.Port,
