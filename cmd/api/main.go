@@ -3,11 +3,15 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 	"time"
+
+	"github.com/shamim1845/olx-api/internal/config"
 )
 
 func main() {
+	// load configuration
+	cfg := config.MustLoad()
+
 	// create a new servemux
 	mux := http.NewServeMux()
 
@@ -27,15 +31,9 @@ func main() {
 		w.Write([]byte(`{"status": "ok", "message": "Server is up and running."}`))
 	})
 
-	// Get port from environment variable or default to 8090
-	PORT := os.Getenv("PORT")
-	if PORT == "" {
-		PORT = "8090"
-	}
-	
 	// create HTTP server with timeout
 	srv := http.Server {
-		Addr: ":" + PORT,
+		Addr: ":" + cfg.Port,
 		Handler: mux,
 		ReadTimeout:  time.Second * 10,
 		WriteTimeout:  time.Second * 30,
@@ -43,7 +41,7 @@ func main() {
 	}
 	
 	// Log before blocking call
-	log.Printf("Server is running on port %v", PORT)
+	log.Printf("Server is running on port %v", cfg.Port)
 
 	// Listen on a specific port (blocks until error)
 	if err := srv.ListenAndServe(); err != nil {
