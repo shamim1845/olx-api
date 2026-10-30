@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/shamim1845/olx-api/internal/config"
+	"github.com/shamim1845/olx-api/internal/handlers"
 )
 
 func main() {
@@ -16,12 +17,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	// Root API endpoint
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-
-		w.Write([]byte(`{"version": "1.0.0", "status": "ok", "message": "Welcome to OLX clone API"}`))
-	})
+	mux.HandleFunc("GET /", handlers.Health)
 
 	// Health check endpoint
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
