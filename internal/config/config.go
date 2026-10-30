@@ -8,8 +8,9 @@ import (
 
 // Config holds the configuration for the application
 type Config struct {
-	Port string
-	Env  string
+	Port   string
+	Env    string
+	DB_Url string
 }
 
 // MustLoad loads the configuration from the environment variables.
@@ -31,8 +32,15 @@ func MustLoad() Config {
 		panic("ENV environment variable is not set")
 	}
 
+	// Get DB_URL from environment variable
+	DB_Url := os.Getenv("DB_URL")
+	if DB_Url == "" {
+		panic("DB_URL environment variable is not set")
+	}
+
 	return Config{
-		Port: Port,
-		Env: Env,
+		Port:   Port,
+		Env:    Env,
+		DB_Url: DB_Url,
 	}
 }
